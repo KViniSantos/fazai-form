@@ -36,10 +36,12 @@ export type PreRegistrationAction =
   | { type: 'UPDATE_SERVICE'; index: number; patch: Partial<ServiceDraft> }
   | { type: 'ADD_SERVICE' }
   | { type: 'REMOVE_SERVICE'; index: number }
+  | { type: 'SET_ACTIVE_SERVICE'; index: number }
   | { type: 'SET_IMAGES'; index: number; images: PreparedImage[] }
   | { type: 'SET_CONSENTS'; patch: Partial<Pick<PreRegistrationState, 'termsAccepted' | 'serviceTermsAccepted' | 'privacyAccepted' | 'publicationConsent'>> }
   | { type: 'NEXT' }
   | { type: 'BACK' }
+  | { type: 'GO_TO_STEP'; step: WizardStep }
   | { type: 'REQUEST_OTP'; email: string }
   | { type: 'VERIFY_OTP'; userId: string }
   | { type: 'SUBMIT_SUCCESS'; result: SubmissionResult }
@@ -90,7 +92,7 @@ export function preRegistrationReducer(
       return {
         ...state,
         services: [...state.services, makeEmptyService()],
-        activeServiceIndex: state.services.length,
+        activeServiceIndex: state.activeServiceIndex,
       };
     case 'REMOVE_SERVICE':
       if (state.services.length <= 1 || !state.services[action.index]) return state;
@@ -98,6 +100,11 @@ export function preRegistrationReducer(
         ...state,
         services: state.services.filter((_, index) => index !== action.index),
         activeServiceIndex: Math.min(state.activeServiceIndex, state.services.length - 2),
+      };
+    case 'SET_ACTIVE_SERVICE':
+      return {
+        ...state,
+        activeServiceIndex: Math.max(0, Math.min(action.index, state.services.length - 1)),
       };
     case 'SET_IMAGES': {
       const service = state.services[action.index];
@@ -118,6 +125,8 @@ export function preRegistrationReducer(
       const previousIndex = Math.max(steps.indexOf(state.step) - 1, 0);
       return { ...state, step: steps[previousIndex] };
     }
+    case 'GO_TO_STEP':
+      return { ...state, step: action.step };
     case 'REQUEST_OTP':
       return { ...state, email: action.email.trim().toLowerCase(), step: 'otp' };
     case 'VERIFY_OTP':

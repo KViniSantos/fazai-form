@@ -9,7 +9,7 @@ describe('FazAí provider pre-registration app', () => {
     expect(
       screen.getByRole('heading', { name: /cadastre seu serviço no fazaí/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/fortaleza/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/fortaleza/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /começar cadastro/i })).toBeInTheDocument();
   });
 });

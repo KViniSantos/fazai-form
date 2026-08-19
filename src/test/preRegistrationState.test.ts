@@ -37,7 +37,19 @@ describe('provider pre-registration wizard state', () => {
     const withThird = preRegistrationReducer(withSecond, { type: 'ADD_SERVICE' });
 
     expect(withSecond.services).toHaveLength(2);
+    expect(withSecond.activeServiceIndex).toBe(0);
     expect(withThird.services).toHaveLength(2);
+  });
+
+  it('can route the wizard to a specific service without changing the draft', () => {
+    const started = preRegistrationReducer(initialPreRegistrationState, { type: 'START' });
+    const withSecond = preRegistrationReducer(started, { type: 'ADD_SERVICE' });
+    const onSecond = preRegistrationReducer(withSecond, { type: 'SET_ACTIVE_SERVICE', index: 1 });
+    const onSecondService = preRegistrationReducer(onSecond, { type: 'GO_TO_STEP', step: 'service' });
+
+    expect(onSecondService.activeServiceIndex).toBe(1);
+    expect(onSecondService.step).toBe('service');
+    expect(onSecondService.services).toHaveLength(2);
   });
 
   it('persists only the serializable draft and restores the current version', () => {

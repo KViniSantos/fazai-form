@@ -31,5 +31,3 @@ export function createSupabaseBrowserClient(source?: EnvSource): SupabaseClient 
   const { supabaseUrl, supabaseAnonKey } = readPublicSupabaseEnv(source);
   return createClient(supabaseUrl, supabaseAnonKey);
 }
-
-export const supabase = createSupabaseBrowserClient();
