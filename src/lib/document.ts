@@ -2,6 +2,21 @@ export function normalizeDocument(value: string): string {
   return value.replace(/\D/g, '');
 }
 
+export function maskDocument(value: string, type: 'cpf' | 'cnpj' | ''): string {
+  const digits = normalizeDocument(value).slice(0, type === 'cnpj' ? 14 : 11);
+  if (type === 'cnpj') {
+    return digits
+      .replace(/^(\d{2})(\d)/, '$1.$2')
+      .replace(/^(\d{2}\.\d{3})(\d)/, '$1.$2')
+      .replace(/^(\d{2}\.\d{3}\.\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  }
+  return digits
+    .replace(/^(\d{3})(\d)/, '$1.$2')
+    .replace(/^(\d{3}\.\d{3})(\d)/, '$1.$2')
+    .replace(/^(\d{3}\.\d{3}\.\d{3})(\d{1,2})$/, '$1-$2');
+}
+
 function isValidCpf(value: string): boolean {
   const digits = normalizeDocument(value);
   if (digits.length !== 11 || /^(\d)\1{10}$/.test(digits)) return false;
