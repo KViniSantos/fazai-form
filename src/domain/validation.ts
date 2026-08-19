@@ -96,10 +96,10 @@ export function validateSubmission(input: {
     profile: profileSchema,
     services: z.array(serviceSchema).min(1, 'Adicione pelo menos um serviço.').max(MAX_SERVICES, 'Você pode cadastrar até dois serviços.'),
     email: z.string().trim().email('Informe um e-mail válido.'),
-    termsAccepted: z.literal(true, { error: 'Aceite os Termos de Uso.' }),
-    serviceTermsAccepted: z.literal(true, { error: 'Aceite os Termos de Serviço.' }),
-    privacyAccepted: z.literal(true, { error: 'Aceite a Política de Privacidade.' }),
-    publicationConsent: z.literal(true, { error: 'Autorize a publicação do serviço.' }),
+    termsAccepted: z.literal(true, { message: 'Aceite os Termos de Uso.' }),
+    serviceTermsAccepted: z.literal(true, { message: 'Aceite os Termos de Serviço.' }),
+    privacyAccepted: z.literal(true, { message: 'Aceite a Política de Privacidade.' }),
+    publicationConsent: z.literal(true, { message: 'Autorize a publicação do serviço.' }),
   }).safeParse(input);
 
   return result;
