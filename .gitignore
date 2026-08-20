@@ -4,4 +4,4 @@ dist/
 .env.*
 !.env.example
 .superpowers/
-
+supabase/.temp/
