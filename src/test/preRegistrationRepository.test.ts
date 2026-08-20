@@ -107,6 +107,19 @@ describe('pre-registration Supabase repository', () => {
     );
   });
 
+  it('translates an OTP requested too recently into a useful message', async () => {
+    const { client, auth } = makeClient();
+    auth.signInWithOtp.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Token has been sent recently' },
+    });
+    const repository = createPreRegistrationRepository(client);
+
+    await expect(repository.requestEmailOtp('prestador@example.com')).rejects.toThrow(
+      'Um código foi enviado recentemente. Aguarde um minuto antes de pedir outro.',
+    );
+  });
+
   it('translates an expired or invalid OTP into a useful message', async () => {
     const { client, auth } = makeClient();
     auth.verifyOtp.mockResolvedValueOnce({

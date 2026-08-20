@@ -80,6 +80,9 @@ function errorFrom(value: SupabaseError | null, fallback: string): Error | null 
 
 function emailOtpError(value: SupabaseError | null): Error | null {
   if (!value) return null;
+  if (/token.*recently|recently.*token|only request.*after/i.test(value.message)) {
+    return new Error('Um código foi enviado recentemente. Aguarde um minuto antes de pedir outro.');
+  }
   if (/status code returned from hook:\s*5\d\d/i.test(value.message)) {
     return new Error('Não foi possível enviar o código agora. Tente novamente em alguns minutos.');
   }
