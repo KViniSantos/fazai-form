@@ -453,18 +453,18 @@ BEGIN
   END IF;
 
   IF EXISTS (
-    SELECT 1 FROM public.servicos
-    WHERE usuario_id = v_user_id
-      AND (status = 'pendente' OR pre_cadastro_locked = true)
+    SELECT 1 FROM public.servicos AS servico_existente
+    WHERE servico_existente.usuario_id = v_user_id
+      AND (servico_existente.status = 'pendente' OR servico_existente.pre_cadastro_locked = true)
   ) THEN
     RAISE EXCEPTION 'Este pre-cadastro ja foi enviado e esta bloqueado para edicao';
   END IF;
 
   PERFORM pg_advisory_xact_lock(hashtextextended(v_user_id::text, 0));
   SELECT count(*)::integer INTO v_existing_count
-  FROM public.servicos
-  WHERE usuario_id = v_user_id
-    AND status IN ('rascunho', 'ativo', 'pendente');
+  FROM public.servicos AS servico_contado
+  WHERE servico_contado.usuario_id = v_user_id
+    AND servico_contado.status IN ('rascunho', 'ativo', 'pendente');
   IF v_existing_count + v_service_count > v_max_services THEN
     RAISE EXCEPTION 'Limite de 2 servicos por conta atingido';
   END IF;
@@ -569,7 +569,7 @@ BEGIN
     END IF;
 
     PERFORM set_config('app.secure_service_rpc', 'true', true);
-    UPDATE public.servicos
+    UPDATE public.servicos AS servico_enviado
     SET
       pre_cadastro_locked = true,
       pre_cadastro_submitted_at = v_now,
@@ -580,8 +580,8 @@ BEGIN
       consentimento_publicacao_em = v_now,
       consentimento_publicacao_versao = trim(p_publication_version),
       updated_at = now()
-    WHERE id = v_saved_service.id
-      AND status = 'pendente'::public.status_servico;
+    WHERE servico_enviado.id = v_saved_service.id
+      AND servico_enviado.status = 'pendente'::public.status_servico;
     GET DIAGNOSTICS v_rows = ROW_COUNT;
     IF v_rows <> 1 THEN
       RAISE EXCEPTION 'Nao foi possivel bloquear o servico enviado';
