@@ -183,6 +183,11 @@ h1 {
 
 .landing-note h2 { margin: 0 0 8px; color: #171b24; font-size: 1.2rem; }
 .landing-note p { margin: 0; }
+.landing-note--how-it-works { margin: 28px 0; }
+.landing-note--how-it-works ol { display: grid; gap: 12px; margin: 16px 0; padding-left: 1.35rem; }
+.landing-note--how-it-works li { padding-left: 4px; }
+.landing-note--how-it-works li::marker { color: #d92f4b; font-weight: 800; }
+.landing-note--how-it-works strong { color: #303746; }
 
 .launch-callout { display: grid; gap: 14px; margin-top: 18px; padding: 20px 22px; border: 1px solid #f0d2d8; border-radius: 20px; background: #fff8f9; }
 .launch-callout__logos { display: flex; align-items: center; gap: 12px; }

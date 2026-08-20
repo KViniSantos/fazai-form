@@ -84,7 +84,7 @@ describe('public provider pre-registration flow', () => {
     await screen.findByRole('heading', { name: /confirme seu e-mail/i });
     await user.type(screen.getByLabelText(/^e-mail/i), 'ana@example.com');
     await user.click(screen.getByRole('button', { name: /enviar c\u00f3digo/i }));
-    await user.type(await screen.findByLabelText(/c\u00f3digo de 6 d\u00edgitos/i), '123456');
+    await user.type(await screen.findByLabelText(/c\u00f3digo de 8 d\u00edgitos/i), '12345678');
     await user.click(screen.getByRole('button', { name: /confirmar c\u00f3digo/i }));
 
     await waitFor(() => expect(dependencies.repository.submit).toHaveBeenCalledTimes(1));

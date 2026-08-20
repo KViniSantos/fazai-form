@@ -86,6 +86,14 @@ function emailOtpError(value: SupabaseError | null): Error | null {
   return errorFrom(value, 'Não foi possível enviar o código.');
 }
 
+function verifyEmailOtpError(value: SupabaseError | null): Error | null {
+  if (!value) return null;
+  if (/token has expired or is invalid/i.test(value.message)) {
+    return new Error('O código expirou ou é inválido. Peça um novo código e tente novamente.');
+  }
+  return errorFrom(value, 'Não foi possível confirmar o código.');
+}
+
 function serializeProfile(profile: ProfileDraft): Record<string, unknown> {
   return {
     nome: profile.nome.trim(),
@@ -154,7 +162,7 @@ export function createPreRegistrationRepository(client: PreRegistrationClient) {
       token: token.trim(),
       type: 'email',
     });
-    const verifyError = errorFrom(error, 'Não foi possível confirmar o código.');
+    const verifyError = verifyEmailOtpError(error);
     if (verifyError) throw verifyError;
     if (!data?.user?.id) throw new Error('A sessão autenticada não foi criada.');
 

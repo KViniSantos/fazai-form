@@ -80,7 +80,7 @@ describe('pre-registration Supabase repository', () => {
     const repository = createPreRegistrationRepository(client);
 
     await repository.requestEmailOtp(' prestador@example.com ');
-    await repository.verifyEmailOtp('prestador@example.com', '123456');
+    await repository.verifyEmailOtp('prestador@example.com', '12345678');
 
     expect(auth.signInWithOtp).toHaveBeenCalledWith({
       email: 'prestador@example.com',
@@ -88,7 +88,7 @@ describe('pre-registration Supabase repository', () => {
     });
     expect(auth.verifyOtp).toHaveBeenCalledWith({
       email: 'prestador@example.com',
-      token: '123456',
+      token: '12345678',
       type: 'email',
     });
     expect(auth.signInWithOtp.mock.calls.flat()).not.toContain('password');
@@ -104,6 +104,19 @@ describe('pre-registration Supabase repository', () => {
 
     await expect(repository.requestEmailOtp('prestador@example.com')).rejects.toThrow(
       'Não foi possível enviar o código agora. Tente novamente em alguns minutos.',
+    );
+  });
+
+  it('translates an expired or invalid OTP into a useful message', async () => {
+    const { client, auth } = makeClient();
+    auth.verifyOtp.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Token has expired or is invalid' },
+    });
+    const repository = createPreRegistrationRepository(client);
+
+    await expect(repository.verifyEmailOtp('prestador@example.com', '12345678')).rejects.toThrow(
+      'O código expirou ou é inválido. Peça um novo código e tente novamente.',
     );
   });
 

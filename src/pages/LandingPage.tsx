@@ -19,6 +19,15 @@ export default function LandingPage({ onStart, siteUrl = import.meta.env.VITE_SI
         <p className="landing-lede">
           Uma plataforma para conectar pessoas que precisam de serviços a profissionais que oferecem seu trabalho.
         </p>
+        <section className="landing-note landing-note--how-it-works" aria-labelledby="how-it-works-title">
+          <h2 id="how-it-works-title">Como funciona</h2>
+          <ol>
+            <li><strong>Conte sobre o seu trabalho.</strong> Preencha seu perfil e os dados do serviço que você oferece.</li>
+            <li><strong>Mostre o que você faz.</strong> Adicione fotos reais para apresentar o seu serviço.</li>
+            <li><strong>Confirme seu e-mail.</strong> Revise as informações e use o código enviado para concluir.</li>
+          </ol>
+          <p>Cada serviço é analisado antes da publicação para manter a qualidade da plataforma.</p>
+        </section>
         <div className="landing-actions">
           <button type="button" className="primary-button" onClick={onStart}>Começar cadastro</button>
           <span>Gratuito e feito para profissionais de Fortaleza.</span>
@@ -26,15 +35,11 @@ export default function LandingPage({ onStart, siteUrl = import.meta.env.VITE_SI
       </section>
 
       <section className="benefit-grid" aria-label="Informações do pré-lançamento">
-        <article><strong>Gratuito</strong><span>Cadastre seu trabalho sem custo nesta fase.</span></article>
+        <article><strong>Gratuito</strong><span>Cadastre seu trabalho de graça.</span></article>
         <article><strong>Primeiros profissionais</strong><span>Faça parte da construção da oferta inicial do FazAí.</span></article>
-        <article><strong>Até 2 serviços</strong><span>Você pode enviar até dois serviços por conta.</span></article>
-        <article><strong>Até 5 imagens</strong><span>Mostre seu serviço com imagens leves e preparadas.</span></article>
       </section>
 
       <section className="landing-note">
-        <h2>Como funciona</h2>
-        <p>O cadastro é enviado para análise antes da publicação. Nesta fase, o foco é Fortaleza/CE; a aprovação é individual para cada serviço.</p>
         <nav className="legal-links" aria-label="Informações legais">
           <a href={link('/termos')}>Termos de Uso</a>
           <a href={link('/termos-de-servico')}>Termos de Serviço</a>

@@ -9,9 +9,10 @@ describe('public pre-registration landing page', () => {
     expect(screen.getByRole('heading', { name: /cadastre seu serviço no fazaí/i })).toBeInTheDocument();
     expect(screen.getByText('Gratuito', { exact: true })).toBeInTheDocument();
     expect(screen.getByText('Pré-lançamento em Fortaleza', { exact: true })).toBeInTheDocument();
-    expect(screen.getByText(/até 2 serviços/i)).toBeInTheDocument();
-    expect(screen.getByText(/até 5 imagens/i)).toBeInTheDocument();
-    expect(screen.getByText(/análise antes da publicação/i)).toBeInTheDocument();
+    expect(screen.getByText('Cadastre seu trabalho de graça.')).toBeInTheDocument();
+    expect(screen.queryByText(/até 2 serviços/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/até 5 imagens/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/analisado antes da publicação/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /começar cadastro/i })).toBeInTheDocument();
   });
 });
