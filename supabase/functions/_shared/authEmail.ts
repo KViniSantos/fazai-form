@@ -137,6 +137,12 @@ function displayName(payload: AuthEmailHookPayload): string {
     : 'pessoa';
 }
 
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  })[character] ?? character);
+}
+
 function verificationDelivery(
   payload: AuthEmailHookPayload,
   environment: AuthEmailEnvironment,
@@ -155,6 +161,7 @@ function verificationDelivery(
     params: {
       name: displayName(payload),
       code: requiredToken(input.token, 'authentication token'),
+      action_type: payload.email_data.email_action_type,
       action_url: buildAuthVerifyUrl({
         supabaseUrl: environment.supabaseUrl,
         tokenHash,
@@ -231,4 +238,31 @@ export function buildAuthEmailDeliveries(
     token: payload.email_data.token,
     tokenHash: payload.email_data.token_hash,
   })];
+}
+
+export function buildAuthEmailFallback(delivery: AuthEmailDelivery): { subject: string; html: string } {
+  const code = escapeHtml(delivery.params.code || '');
+  const isOtp = delivery.params.action_type === 'magiclink';
+  const title = delivery.templateKey === 'auth_recovery'
+    ? 'Redefina sua senha'
+    : delivery.templateKey === 'auth_email_change'
+      ? 'Confirme seu novo e-mail'
+      : isOtp ? 'Seu código de confirmação' : 'Confirme seu cadastro';
+  const content = delivery.templateKey === 'auth_recovery'
+    ? 'Recebemos um pedido para redefinir sua senha.'
+    : isOtp
+      ? 'Use o código abaixo para confirmar seu e-mail e continuar o pré-cadastro.'
+      : delivery.templateKey === 'auth_email_change'
+        ? 'Confirme a alteração do seu endereço de e-mail.'
+        : 'Confirme seu e-mail para concluir seu cadastro.';
+  const action = isOtp
+    ? `<div style="margin:24px 0;padding:18px 22px;border:1px solid #f3b6c1;border-radius:14px;background:#fff5f6;color:#a8223a;font-size:32px;font-weight:700;letter-spacing:8px;text-align:center">${code}</div>`
+    : delivery.params.action_url
+      ? `<a href="${escapeHtml(delivery.params.action_url)}" style="display:inline-block;background:#d92f4b;color:#ffffff;padding:13px 22px;border-radius:999px;text-decoration:none;font-weight:700">Continuar com segurança</a>`
+      : `<div style="font-size:28px;font-weight:700;letter-spacing:6px;color:#a8223a">${code}</div>`;
+
+  return {
+    subject: isOtp ? 'Seu código de confirmação do FazAí' : title,
+    html: `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#f7f8fb;font-family:Arial,sans-serif;color:#252b38"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:24px 14px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #e8eaf0;border-radius:18px;overflow:hidden"><tr><td style="padding:22px 28px;background:#d92f4b;color:#ffffff;font-size:22px;font-weight:700">FazAí</td></tr><tr><td style="padding:30px 28px"><h1 style="margin:0 0 14px;color:#171b24;font-size:26px">${title}</h1><p style="margin:0 0 12px;font-size:16px;line-height:1.55">Bem-vindo ao FazAí!</p><p style="margin:0 0 20px;color:#5c6372;font-size:15px;line-height:1.6">${content}</p>${action}<p style="margin:20px 0 0;color:#7a8290;font-size:13px;line-height:1.5">Se você não solicitou isso, ignore este e-mail.</p></td></tr><tr><td style="padding:18px 28px;color:#7a8290;background:#fbfbfd;font-size:12px">FazAí — conectando pessoas a bons serviços.</td></tr></table></td></tr></table></body></html>`,
+  };
 }

@@ -16,7 +16,7 @@ export default function ServiceDetailsStep({ service, categories, onChange, erro
 
   return (
     <section className="form-card" aria-labelledby="service-title">
-      <div className="section-heading"><p className="eyebrow">Etapa 2 de 4</p><h2 id="service-title">Descreva seu serviço</h2><p>Conte com clareza o que você oferece para clientes de Fortaleza.</p></div>
+      <div className="section-heading"><p className="eyebrow">Etapa 3 de 6</p><h2 id="service-title">Descreva seu serviço</h2><p>Conte com clareza o que você oferece para clientes de Fortaleza.</p></div>
       <FormField label="Categoria" htmlFor="service-category" required error={errors.categoriaId}><select id="service-category" value={service.categoriaId} onChange={(event) => onChange({ categoriaId: event.target.value })} aria-invalid={Boolean(errors.categoriaId)} aria-describedby={errors.categoriaId ? 'service-category-error' : undefined} required><option value="">Selecione uma categoria</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.nome}</option>)}</select></FormField>
       <FormField label="Nome do serviço" htmlFor="service-name" required error={errors.titulo}><input id="service-name" value={service.titulo} onChange={(event) => onChange({ titulo: event.target.value })} maxLength={60} aria-invalid={Boolean(errors.titulo)} aria-describedby={errors.titulo ? 'service-name-error' : undefined} required /></FormField>
       <FormField label="Descrição" htmlFor="service-description" required error={errors.descricao}>
@@ -25,11 +25,14 @@ export default function ServiceDetailsStep({ service, categories, onChange, erro
       </FormField>
       <div className="form-grid two-columns">
         <FormField label="Tipo de preço" htmlFor="service-price-type" required><select id="service-price-type" value={service.tipoPreco} onChange={(event) => onChange({ tipoPreco: event.target.value as PriceType })} required><option value="a_combinar">A combinar</option><option value="fixo">Preço fixo</option><option value="por_hora">Por hora</option></select></FormField>
-        <div className="location-lock" aria-label="Localização fixa">Atendimento em <strong>Fortaleza/CE</strong></div>
+        <div className="form-field form-field--static">
+          <span className="field-label">Localização</span>
+          <div className="location-lock" aria-label="Localização fixa">Atendimento em <strong>Fortaleza/CE</strong></div>
+        </div>
       </div>
       <div className="form-grid two-columns">
         <FormField label="Preço mínimo" htmlFor="service-min-price" error={errors.precoMinimo} hint="Opcional quando o preço é a combinar."><input className="price-input" id="service-min-price" type="number" min="0" step="0.01" value={service.precoMinimo ?? ''} onChange={(event) => onChange({ precoMinimo: event.target.value ? Number(event.target.value) : null })} aria-invalid={Boolean(errors.precoMinimo)} aria-describedby={errors.precoMinimo ? 'service-min-price-error' : undefined} /></FormField>
-        <FormField label="Preço máximo" htmlFor="service-max-price" error={errors.precoMaximo}><input className="price-input" id="service-max-price" type="number" min="0" step="0.01" value={service.precoMaximo ?? ''} onChange={(event) => onChange({ precoMaximo: event.target.value ? Number(event.target.value) : null })} aria-invalid={Boolean(errors.precoMaximo)} aria-describedby={errors.precoMaximo ? 'service-max-price-error' : undefined} /></FormField>
+        <FormField label="Preço máximo" htmlFor="service-max-price" error={errors.precoMaximo} hint="Opcional quando não houver um valor máximo."><input className="price-input" id="service-max-price" type="number" min="0" step="0.01" value={service.precoMaximo ?? ''} onChange={(event) => onChange({ precoMaximo: event.target.value ? Number(event.target.value) : null })} aria-invalid={Boolean(errors.precoMaximo)} aria-describedby={errors.precoMaximo ? 'service-max-price-error' : undefined} /></FormField>
       </div>
     </section>
   );

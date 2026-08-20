@@ -60,7 +60,7 @@ export default function ProfileStep({ profile, onChange, errors = {}, cepLookup 
 
   return (
     <section className="form-card" aria-labelledby="profile-title">
-      <div className="section-heading"><p className="eyebrow">Etapa 1 de 4</p><h2 id="profile-title">Fale um pouco sobre você</h2><p>Esses dados ficam associados à sua conta de prestador.</p></div>
+      <div className="section-heading"><p className="eyebrow">Etapa 2 de 6</p><h2 id="profile-title">Fale um pouco sobre você</h2><p>Esses dados ficam associados à sua conta de prestador.</p></div>
       <div className="form-grid two-columns">
         <FormField label="Nome" htmlFor="profile-name" required><input id="profile-name" value={profile.nome} onChange={(event) => onChange({ nome: event.target.value })} autoComplete="given-name" required /></FormField>
         <FormField label="Sobrenome" htmlFor="profile-last-name" required><input id="profile-last-name" value={profile.sobrenome} onChange={(event) => onChange({ sobrenome: event.target.value })} autoComplete="family-name" required /></FormField>

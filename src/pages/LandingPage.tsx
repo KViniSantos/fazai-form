@@ -1,4 +1,5 @@
 import BrandMark from '@/components/BrandMark';
+import ProgressHeader from '@/components/ProgressHeader';
 
 interface LandingPageProps {
   onStart: () => void;
@@ -11,6 +12,7 @@ export default function LandingPage({ onStart, siteUrl = import.meta.env.VITE_SI
   return (
     <main className="public-shell">
       <header className="public-header"><BrandMark /><span>Pré-lançamento em Fortaleza</span></header>
+      <ProgressHeader currentStep="landing" />
       <section className="landing-hero" aria-labelledby="landing-title">
         <p className="eyebrow">Oferta inicial FazAí</p>
         <h1 id="landing-title">Cadastre seu serviço no FazAí</h1>
@@ -38,6 +40,23 @@ export default function LandingPage({ onStart, siteUrl = import.meta.env.VITE_SI
           <a href={link('/termos-de-servico')}>Termos de Serviço</a>
           <a href={link('/privacidade')}>Política de Privacidade</a>
         </nav>
+      </section>
+
+      <section className="launch-callout" aria-label="Lançamento do aplicativo FazAí">
+        <div className="launch-callout__logos">
+          <BrandMark />
+          <span className="launch-callout__plus" aria-hidden="true">+</span>
+          <svg className="play-store-logo" role="img" aria-label="Google Play" viewBox="0 0 48 48">
+            <path fill="#34A853" d="M4 4.8 27.7 24 4 43.2c-.7-.8-1.1-1.9-1.1-3.2V8c0-1.3.4-2.4 1.1-3.2Z" />
+            <path fill="#4285F4" d="m4 4.8 28.4 15.9-4.7 3.3L4 4.8Z" />
+            <path fill="#FBBC04" d="m4 43.2 23.7-19.1 4.7 3.3L4 43.2Z" />
+            <path fill="#EA4335" d="m32.4 20.7 8.2 4.6c2 1.1 2 2.4 0 3.5l-8.2 4.6-4.7-6.3 4.7-6.4Z" />
+          </svg>
+        </div>
+        <div>
+          <strong>Em breve na Google Play</strong>
+          <p>Quando o FazAí for lançado, você poderá acessar sua conta pelo site e baixar o aplicativo Android.</p>
+        </div>
       </section>
     </main>
   );

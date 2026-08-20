@@ -1,7 +1,9 @@
+import officialLogo from '@/assets/fazai-logo.png';
+
 export default function BrandMark() {
   return (
     <div className="brand-mark" aria-label="FazAí">
-      <span className="brand-mark__dot" aria-hidden="true" />
+      <img className="brand-mark__logo" src={officialLogo} alt="FazAí" />
       <span>FazAí</span>
     </div>
   );

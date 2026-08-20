@@ -3,6 +3,7 @@ import {
   AuthEmailHookPayload,
   AuthTemplateKey,
   buildAuthEmailDeliveries,
+  buildAuthEmailFallback,
 } from '../_shared/authEmail.ts';
 import { sendBrevoTemplate } from '../_shared/brevoClient.ts';
 import { sendBrevoTransactional } from '../_shared/brevoTransactional.ts';
@@ -50,38 +51,7 @@ function getTemplateIds(): Record<AuthTemplateKey, number> {
   })) as Record<AuthTemplateKey, number>;
 }
 
-function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[character] ?? character);
-}
-
-function fallbackEmailTitle(templateKey: AuthTemplateKey): string {
-  if (templateKey === 'auth_recovery') return 'Redefina sua senha';
-  if (templateKey === 'auth_confirmation') return 'Confirme seu cadastro';
-  if (templateKey === 'auth_email_change') return 'Confirme seu novo e-mail';
-  return 'Código de segurança';
-}
-
-function fallbackEmail(delivery: { templateKey: AuthTemplateKey; params: Record<string, string> }): { subject: string; html: string } {
-  const name = escapeHtml(delivery.params.name || 'pessoa');
-  const actionUrl = delivery.params.action_url;
-  const code = escapeHtml(delivery.params.code || '');
-  const content = delivery.templateKey === 'auth_recovery'
-    ? 'Recebemos um pedido para redefinir sua senha.'
-    : delivery.templateKey === 'auth_confirmation'
-      ? 'Confirme seu e-mail para concluir seu cadastro.'
-      : delivery.templateKey === 'auth_email_change'
-        ? 'Confirme a alteração do seu endereço de e-mail.'
-        : 'Use o código abaixo para confirmar esta ação.';
-  const action = actionUrl
-    ? `<a href="${escapeHtml(actionUrl)}" style="display:inline-block;background:#2563eb;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600">Continuar com segurança</a>`
-    : `<p style="font-size:28px;font-weight:700;letter-spacing:6px">${code}</p>`;
-  return {
-    subject: delivery.templateKey === 'auth_recovery' ? 'Redefina sua senha' : 'Confirmação de segurança',
-    html: `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#f4f6f8;font-family:Arial,sans-serif;color:#172033"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:24px"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:16px"><tr><td style="padding:28px"><img src="https://fazaih.lovable.app/logo.png" width="48" height="48" alt="FazAí"><h1 style="margin:20px 0 12px">${escapeHtml(fallbackEmailTitle(delivery.templateKey))}</h1><p>Olá, ${name}.</p><p>${content}</p><p>${action}</p><p>Se você não solicitou isso, ignore este e-mail.</p></td></tr><tr><td style="padding:18px 28px;color:#64748b;font-size:12px">FazAí — segurança da sua conta em primeiro lugar.</td></tr></table></td></tr></table></body></html>`,
-  };
-}async function stableIdempotencyKey(source: string): Promise<string> {
+async function stableIdempotencyKey(source: string): Promise<string> {
   const digest = await crypto.subtle.digest(
     'SHA-256',
     new TextEncoder().encode(source),
@@ -134,6 +104,9 @@ Deno.serve(async (req) => {
     });
 
     try {
+      if (payload.email_data.email_action_type === 'magiclink') {
+        throw new Error('OTP uses branded transactional email');
+      }
       const templateIds = getTemplateIds();
       await Promise.all(deliveries.map(async (delivery) => {
         await sendBrevoTemplate({
@@ -148,7 +121,7 @@ Deno.serve(async (req) => {
         action: payload.email_data.email_action_type,
       });
       await Promise.all(deliveries.map(async (delivery) => {
-        const fallback = fallbackEmail(delivery);
+        const fallback = buildAuthEmailFallback(delivery);
         await sendBrevoTransactional({
           apiKey: BREVO_API_KEY, senderEmail: BREVO_SENDER_EMAIL, senderName: BREVO_SENDER_NAME,
           to: delivery.to, subject: fallback.subject, html: fallback.html,

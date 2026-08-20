@@ -25,7 +25,7 @@ Após a confirmação do e-mail, o serviço deve aparecer individualmente na vis
 
 O OTP é enviado pelo mecanismo de autenticação do Supabase. A aprovação ou rejeição continua acionando o mecanismo existente de moderação/Brevo. A tela de recebimento não envia uma senha e não cria uma senha por e-mail.
 
-A função `send-auth-email` precisa aceitar a ação `magiclink`, usada pelo login sem senha. A versão 22 foi implantada em 20/08/2026 com esse mapeamento para o template existente `auth_confirmation`. Depois de alterações nessa função, teste um OTP real e confira os logs da Edge Function e do Brevo.
+A função `send-auth-email` precisa aceitar a ação `magiclink`, usada pelo login sem senha. A versão atual foi implantada em 20/08/2026 e envia essa ação por um e-mail transacional FazAí, com código visível e sem redirecionamento para o aplicativo principal. Depois de alterações nessa função, teste um OTP real e confira os logs da Edge Function e do Brevo.
 
 Antes do lançamento público, configure e teste a comunicação de lançamento no fluxo de e-mail já existente, incluindo o site e, somente quando publicado, o link da Google Play Store. Não habilite WhatsApp API, anúncios ou novos provedores de e-mail para esta etapa.
 
