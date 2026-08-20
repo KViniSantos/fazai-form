@@ -11,7 +11,7 @@ import ServiceImagesStep from '@/components/steps/ServiceImagesStep';
 import OtpStep from '@/components/steps/OtpStep';
 import SuccessPage from '@/pages/SuccessPage';
 import { MAX_SERVICES } from '@/domain/constants';
-import { validateProfile, validateService } from '@/domain/validation';
+import { issuesToFieldErrors, validateProfile, validateService, type FieldErrors } from '@/domain/validation';
 import type { SubmissionServiceInput } from '@/infrastructure/supabase/preRegistrationRepository';
 import type { PreRegistrationState, PreRegistrationAction } from '@/hooks/usePreRegistration';
 import type { ServiceCategory, FortalezaCity } from '@/infrastructure/supabase/catalogRepository';
@@ -34,6 +34,8 @@ export default function PreRegistrationWizard({ state, dispatch, dependencies }:
   const [catalogLoading, setCatalogLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [profileErrors, setProfileErrors] = useState<FieldErrors>({});
+  const [serviceErrors, setServiceErrors] = useState<FieldErrors>({});
 
   useEffect(() => {
     let active = true;
@@ -83,22 +85,28 @@ export default function PreRegistrationWizard({ state, dispatch, dependencies }:
     dispatch({ type: 'BACK' });
   };
 
-  const validateCurrentService = () => {
-    if (!currentService) return 'Adicione pelo menos um serviço.';
-    if (!isCatalogReady || !fortaleza) return 'Aguarde o carregamento das categorias e da cidade.';
-    return firstIssue(validateService({ ...currentService, cidadeId: fortaleza.id, cidadeNome: fortaleza.nome, estado: fortaleza.estado, imagemCount: Math.max(1, currentService.imagemCount) }));
-  };
-
   const goFromProfile = () => {
     const validation = validateProfile(state.profile);
-    if (!validation.success) { setError(firstIssue(validation)); return; }
+    if (!validation.success) {
+      setProfileErrors(issuesToFieldErrors(validation));
+      setError('');
+      return;
+    }
+    setProfileErrors({});
     setError('');
     dispatch({ type: 'NEXT' });
   };
 
   const goFromService = () => {
-    const validation = validateCurrentService();
-    if (validation) { setError(validation); return; }
+    if (!currentService) { setError('Adicione pelo menos um serviço.'); return; }
+    if (!isCatalogReady || !fortaleza) { setError('Aguarde o carregamento das categorias e da cidade.'); return; }
+    const validation = validateService({ ...currentService, cidadeId: fortaleza.id, cidadeNome: fortaleza.nome, estado: fortaleza.estado, imagemCount: Math.max(1, currentService.imagemCount) });
+    if (!validation.success) {
+      setServiceErrors(issuesToFieldErrors(validation));
+      setError('');
+      return;
+    }
+    setServiceErrors({});
     setError('');
     dispatch({ type: 'NEXT' });
   };
@@ -183,13 +191,13 @@ export default function PreRegistrationWizard({ state, dispatch, dependencies }:
       <ErrorNotice message={error} />
 
       {state.step === 'profile' ? <>
-        <ProfileStep profile={state.profile} onChange={(patch) => dispatch({ type: 'UPDATE_PROFILE', patch })} />
+        <ProfileStep profile={state.profile} errors={profileErrors} onChange={(patch) => dispatch({ type: 'UPDATE_PROFILE', patch })} />
         <WizardNavigation onBack={goBack} onNext={goFromProfile} />
       </> : null}
 
       {state.step === 'service' && currentService ? <>
         <div className="service-toolbar"><span>Serviço {state.activeServiceIndex + 1} de {state.services.length}</span><button type="button" className="text-button" onClick={() => dispatch({ type: 'ADD_SERVICE' })} disabled={state.services.length >= MAX_SERVICES}>+ Adicionar outro serviço</button></div>
-        <ServiceDetailsStep service={currentService} categories={categories} onChange={updateService} />
+        <ServiceDetailsStep service={currentService} categories={categories} errors={serviceErrors} onChange={updateService} />
         <ServiceAvailabilityStep service={currentService} onChange={updateService} />
         <WizardNavigation onBack={goBack} onNext={goFromService} isNextDisabled={catalogLoading} />
       </> : null}

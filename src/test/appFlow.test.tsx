@@ -63,8 +63,7 @@ describe('public provider pre-registration flow', () => {
     fireEvent.change(screen.getByLabelText(/^Nome/), { target: { value: 'Ana' } });
     fireEvent.change(screen.getByLabelText(/^Sobrenome/), { target: { value: 'Silva' } });
     fireEvent.change(screen.getByLabelText(/data de nascimento/i), { target: { value: '1990-01-15' } });
-    fireEvent.change(screen.getByLabelText(/^Telefone/), { target: { value: '85999998888' } });
-    fireEvent.change(screen.getByLabelText(/^WhatsApp/), { target: { value: '85999998888' } });
+    fireEvent.change(screen.getByLabelText(/^WhatsApp do seu serviço/), { target: { value: '85999998888' } });
     await user.click(screen.getByRole('button', { name: /^continuar$/i }));
 
     await screen.findByRole('heading', { name: /descreva seu servi\u00e7o/i });

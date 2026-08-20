@@ -10,6 +10,8 @@ interface FormFieldProps {
 }
 
 export default function FormField({ label, htmlFor, required, error, hint, children }: FormFieldProps) {
+  const errorId = `${htmlFor}-error`;
+
   return (
     <div className="form-field">
       <label htmlFor={htmlFor}>
@@ -17,7 +19,7 @@ export default function FormField({ label, htmlFor, required, error, hint, child
       </label>
       {children}
       {hint && !error ? <p className="field-hint">{hint}</p> : null}
-      {error ? <p className="field-error" role="alert">{error}</p> : null}
+      {error ? <p id={errorId} className="field-error" role="alert">{error}</p> : null}
     </div>
   );
 }

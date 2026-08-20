@@ -55,7 +55,7 @@ function makeSubmission(uploadedImages: SubmissionInput['services'][number]['ima
       nome: 'Ana',
       sobrenome: 'Silva',
       dataNascimento: '1990-01-15',
-      telefone: '85999998888',
+      whatsapp: '85999998888',
     },
     services: [{
       service: {
@@ -94,6 +94,19 @@ describe('pre-registration Supabase repository', () => {
     expect(auth.signInWithOtp.mock.calls.flat()).not.toContain('password');
   });
 
+  it('translates a failing Supabase send-email hook into a useful message', async () => {
+    const { client, auth } = makeClient();
+    auth.signInWithOtp.mockResolvedValueOnce({
+      data: null,
+      error: { message: 'Unexpected status code returned from hook: 502' },
+    });
+    const repository = createPreRegistrationRepository(client);
+
+    await expect(repository.requestEmailOtp('prestador@example.com')).rejects.toThrow(
+      'Não foi possível enviar o código agora. Tente novamente em alguns minutos.',
+    );
+  });
+
   it('uploads prepared images under the existing provider-owned Storage folder', async () => {
     const { client, bucket } = makeClient();
     const repository = createPreRegistrationRepository(client);
@@ -122,6 +135,10 @@ describe('pre-registration Supabase repository', () => {
     expect(rpc).toHaveBeenCalledWith('submit_pre_registration', expect.objectContaining({
       p_terms_version: LEGAL_VERSION,
       p_publication_version: LEGAL_VERSION,
+      p_profile: expect.objectContaining({
+        telefone: '85999998888',
+        whatsapp: '85999998888',
+      }),
     }));
     expect(client.from).not.toHaveBeenCalledWith('avaliacoes');
 

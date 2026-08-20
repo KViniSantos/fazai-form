@@ -8,6 +8,10 @@
 4. Configure apenas `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_SITE_URL` e, quando existir, `VITE_PLAY_STORE_URL`. A chave `service_role` nunca deve ser colocada neste projeto.
 5. Faça um cadastro real de teste com um e-mail controlado, uma imagem e um serviço.
 
+Se a migration foi aplicada antes de 20/08/2026, execute novamente o arquivo completo no SQL Editor. Ele é idempotente e a nova execução instala também a validação server-side dos dígitos verificadores de CPF/CNPJ e usa o WhatsApp como telefone do perfil.
+
+O preenchimento automático de endereço consulta o ViaCEP diretamente e não exige chave. Uma falha na consulta mantém Rua e Bairro liberados para preenchimento manual.
+
 ## Revisão administrativa
 
 Após a confirmação do e-mail, o serviço deve aparecer individualmente na visão existente `servicos_pendentes_admin`. Revise os dados, a localização, preço e imagens no painel `fazai_adm`.
@@ -21,6 +25,8 @@ Após a confirmação do e-mail, o serviço deve aparecer individualmente na vis
 
 O OTP é enviado pelo mecanismo de autenticação do Supabase. A aprovação ou rejeição continua acionando o mecanismo existente de moderação/Brevo. A tela de recebimento não envia uma senha e não cria uma senha por e-mail.
 
+A função `send-auth-email` precisa aceitar a ação `magiclink`, usada pelo login sem senha. A versão 22 foi implantada em 20/08/2026 com esse mapeamento para o template existente `auth_confirmation`. Depois de alterações nessa função, teste um OTP real e confira os logs da Edge Function e do Brevo.
+
 Antes do lançamento público, configure e teste a comunicação de lançamento no fluxo de e-mail já existente, incluindo o site e, somente quando publicado, o link da Google Play Store. Não habilite WhatsApp API, anúncios ou novos provedores de e-mail para esta etapa.
 
 ## Monitoramento
@@ -33,3 +39,5 @@ Para a meta inicial de pelo menos 200 serviços aprovados, acompanhe no painel:
 - falhas de OTP, Storage e RPC nos logs do Supabase.
 
 Faça um novo teste controlado depois de qualquer alteração na migration, nas políticas do bucket ou nas funções de aprovação.
+
+Faça também uma conferência visual do formulário nas larguras de 320 px, 375 px, 768 px e desktop, verificando rolagem horizontal, botões fixos, contador da descrição e mensagens abaixo dos campos.

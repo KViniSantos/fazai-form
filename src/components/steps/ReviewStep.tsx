@@ -22,7 +22,7 @@ export default function ReviewStep({ profile, services, consents, onConsentChang
   return (
     <section className="form-card" aria-labelledby="review-title">
       <div className="section-heading"><p className="eyebrow">Etapa 4 de 4</p><h2 id="review-title">Revise antes de enviar</h2><p>Confira os dados que serão encaminhados para análise.</p></div>
-      <div className="review-provider"><span>Prestador</span><strong>{`${profile.nome} ${profile.sobrenome}`.trim() || 'Nome não informado'}</strong><small>{profile.whatsapp || profile.telefone || 'Contato não informado'}</small></div>
+      <div className="review-provider"><span>Prestador</span><strong>{`${profile.nome} ${profile.sobrenome}`.trim() || 'Nome não informado'}</strong><small>{profile.whatsapp || 'Contato não informado'}</small></div>
       <div className="summary-list">{services.map((service, index) => <ServiceSummaryCard key={`${service.titulo}-${index}`} service={service} index={index} />)}</div>
       <div className="review-lock-notice"><strong>Importante</strong><p>Após o envio, os dados ficarão bloqueados para edição e serão encaminhados para análise administrativa.</p></div>
       <fieldset className="consent-list"><legend>Confirmações necessárias</legend>

@@ -14,7 +14,7 @@ describe('pre-registration review step', () => {
   it('shows the exact provider, service, price, Fortaleza and image data before sending', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    const profile = { ...makeEmptyProfile(), nome: 'Ana', sobrenome: 'Silva', telefone: '85999998888' };
+    const profile = { ...makeEmptyProfile(), nome: 'Ana', sobrenome: 'Silva', whatsapp: '85999998888' };
     const service = { ...makeEmptyService(), titulo: 'Instalação elétrica', descricao: 'A'.repeat(100), tipoPreco: 'fixo' as const, precoMinimo: 150, cidadeNome: 'Fortaleza', estado: 'CE', imagens: [makeImage()], imagemCount: 1 };
     function ReviewHarness() {
       const [consents, setConsents] = useState({ termsAccepted: false, serviceTermsAccepted: false, privacyAccepted: false, publicationConsent: false });

@@ -28,8 +28,7 @@ const profileSchema = z.object({
     const date = new Date(`${value}T12:00:00`);
     return !Number.isNaN(date.getTime()) && calculateAge(value) >= 18;
   }, 'Você precisa ter pelo menos 18 anos.'),
-  telefone: z.string().refine(isValidBrazilianPhone, 'Informe um telefone brasileiro válido.'),
-  whatsapp: z.string().refine((value) => !value.trim() || isValidBrazilianPhone(value), 'Informe um WhatsApp válido.'),
+  whatsapp: z.string().refine(isValidBrazilianPhone, 'Informe um WhatsApp válido.'),
   documento: z.string(),
   tipoDocumento: z.enum(['', 'cpf', 'cnpj']),
   address: z.object({
@@ -103,4 +102,17 @@ export function validateSubmission(input: {
   }).safeParse(input);
 
   return result;
+}
+
+export type FieldErrors = Record<string, string>;
+
+export function issuesToFieldErrors(result: {
+  success: boolean;
+  error?: { issues: Array<{ path: Array<string | number>; message: string }> };
+}): FieldErrors {
+  if (result.success) return {};
+
+  return Object.fromEntries(
+    (result.error?.issues ?? []).map((issue) => [issue.path.join('.'), issue.message]),
+  );
 }

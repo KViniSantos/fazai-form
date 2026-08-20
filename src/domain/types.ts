@@ -13,7 +13,6 @@ export interface ProfileDraft {
   nome: string;
   sobrenome: string;
   dataNascimento: string;
-  telefone: string;
   whatsapp: string;
   documento: string;
   tipoDocumento: DocumentType;
@@ -81,7 +80,6 @@ export function makeEmptyProfile(): ProfileDraft {
     nome: '',
     sobrenome: '',
     dataNascimento: '',
-    telefone: '',
     whatsapp: '',
     documento: '',
     tipoDocumento: '',

@@ -16,6 +16,70 @@ SET file_size_limit = 5242880,
     allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp']
 WHERE id = 'servicos-imagens';
 
+CREATE OR REPLACE FUNCTION public.is_valid_cpf(p_value text)
+RETURNS boolean
+LANGUAGE plpgsql
+IMMUTABLE
+STRICT
+SET search_path = public
+AS $$
+DECLARE
+  v_digits text := regexp_replace(p_value, '[^0-9]', '', 'g');
+  v_sum integer := 0;
+  v_digit integer;
+  v_index integer;
+BEGIN
+  IF length(v_digits) <> 11 OR v_digits ~ '^(.)\1{10}$' THEN
+    RETURN false;
+  END IF;
+  FOR v_index IN 1..9 LOOP
+    v_sum := v_sum + substring(v_digits FROM v_index FOR 1)::integer * (11 - v_index);
+  END LOOP;
+  v_digit := 11 - (v_sum % 11);
+  IF v_digit >= 10 THEN v_digit := 0; END IF;
+  IF v_digit <> substring(v_digits FROM 10 FOR 1)::integer THEN RETURN false; END IF;
+  v_sum := 0;
+  FOR v_index IN 1..10 LOOP
+    v_sum := v_sum + substring(v_digits FROM v_index FOR 1)::integer * (12 - v_index);
+  END LOOP;
+  v_digit := 11 - (v_sum % 11);
+  IF v_digit >= 10 THEN v_digit := 0; END IF;
+  RETURN v_digit = substring(v_digits FROM 11 FOR 1)::integer;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_valid_cnpj(p_value text)
+RETURNS boolean
+LANGUAGE plpgsql
+IMMUTABLE
+STRICT
+SET search_path = public
+AS $$
+DECLARE
+  v_digits text := regexp_replace(p_value, '[^0-9]', '', 'g');
+  v_first_weights integer[] := ARRAY[5,4,3,2,9,8,7,6,5,4,3,2];
+  v_second_weights integer[] := ARRAY[6,5,4,3,2,9,8,7,6,5,4,3,2];
+  v_sum integer := 0;
+  v_digit integer;
+  v_index integer;
+BEGIN
+  IF length(v_digits) <> 14 OR v_digits ~ '^(.)\1{13}$' THEN
+    RETURN false;
+  END IF;
+  FOR v_index IN 1..12 LOOP
+    v_sum := v_sum + substring(v_digits FROM v_index FOR 1)::integer * v_first_weights[v_index];
+  END LOOP;
+  v_digit := CASE WHEN (v_sum % 11) < 2 THEN 0 ELSE 11 - (v_sum % 11) END;
+  IF v_digit <> substring(v_digits FROM 13 FOR 1)::integer THEN RETURN false; END IF;
+  v_sum := 0;
+  FOR v_index IN 1..13 LOOP
+    v_sum := v_sum + substring(v_digits FROM v_index FOR 1)::integer * v_second_weights[v_index];
+  END LOOP;
+  v_digit := CASE WHEN (v_sum % 11) < 2 THEN 0 ELSE 11 - (v_sum % 11) END;
+  RETURN v_digit = substring(v_digits FROM 14 FOR 1)::integer;
+END;
+$$;
+
 -- Preserve the existing three-argument secure-save contract. The local flag
 -- is only set by the guarded pre-registration transaction below.
 CREATE OR REPLACE FUNCTION public.secure_save_service(
@@ -346,7 +410,7 @@ BEGIN
     RAISE EXCEPTION 'O prestador precisa ter pelo menos 18 anos';
   END IF;
 
-  v_phone_digits := regexp_replace(COALESCE(p_profile->>'telefone', ''), '[^0-9]', '', 'g');
+  v_phone_digits := regexp_replace(COALESCE(p_profile->>'whatsapp', ''), '[^0-9]', '', 'g');
   v_phone_local := CASE WHEN v_phone_digits LIKE '55%'
     THEN substring(v_phone_digits FROM 3) ELSE v_phone_digits END;
   IF length(v_phone_local) NOT IN (10, 11) OR left(v_phone_local, 2) = '00' THEN
@@ -356,9 +420,9 @@ BEGIN
   v_document := NULLIF(regexp_replace(COALESCE(p_profile->>'documento', ''), '[^0-9]', '', 'g'), '');
   v_document_type := NULLIF(lower(trim(COALESCE(p_profile->>'tipo_documento', ''))), '');
   IF v_document IS NOT NULL THEN
-    IF v_document_type = 'cpf' AND length(v_document) <> 11 THEN
+    IF v_document_type = 'cpf' AND NOT public.is_valid_cpf(v_document) THEN
       RAISE EXCEPTION 'CPF invalido';
-    ELSIF v_document_type = 'cnpj' AND length(v_document) <> 14 THEN
+    ELSIF v_document_type = 'cnpj' AND NOT public.is_valid_cnpj(v_document) THEN
       RAISE EXCEPTION 'CNPJ invalido';
     ELSIF v_document_type IS NULL OR v_document_type NOT IN ('cpf', 'cnpj') THEN
       RAISE EXCEPTION 'Tipo de documento invalido';

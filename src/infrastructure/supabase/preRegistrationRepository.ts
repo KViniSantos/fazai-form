@@ -78,12 +78,20 @@ function errorFrom(value: SupabaseError | null, fallback: string): Error | null 
   return value ? new Error(value.message || fallback) : null;
 }
 
+function emailOtpError(value: SupabaseError | null): Error | null {
+  if (!value) return null;
+  if (/status code returned from hook:\s*5\d\d/i.test(value.message)) {
+    return new Error('Não foi possível enviar o código agora. Tente novamente em alguns minutos.');
+  }
+  return errorFrom(value, 'Não foi possível enviar o código.');
+}
+
 function serializeProfile(profile: ProfileDraft): Record<string, unknown> {
   return {
     nome: profile.nome.trim(),
     sobrenome: profile.sobrenome.trim(),
     data_nascimento: profile.dataNascimento,
-    telefone: profile.telefone,
+    telefone: profile.whatsapp,
     whatsapp: profile.whatsapp,
     documento: profile.documento.trim() || null,
     tipo_documento: profile.tipoDocumento || null,
@@ -136,7 +144,7 @@ export function createPreRegistrationRepository(client: PreRegistrationClient) {
       email: normalizedEmail,
       options: { shouldCreateUser: true },
     });
-    const requestError = errorFrom(error, 'Não foi possível enviar o código.');
+    const requestError = emailOtpError(error);
     if (requestError) throw requestError;
   };
 

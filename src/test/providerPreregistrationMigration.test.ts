@@ -23,4 +23,12 @@ describe('provider preregistration shared Supabase migration', () => {
     expect(sql).not.toContain('CREATE TABLE public.avaliacoes');
     expect(sql).not.toContain('CREATE TABLE public.provider_preregistrations');
   });
+
+  it('validates CPF and CNPJ check digits on the server', () => {
+    const sql = readFileSync(migrationPath, 'utf8');
+
+    expect(sql).toMatch(/is_valid_cpf/i);
+    expect(sql).toMatch(/is_valid_cnpj/i);
+    expect(sql).toMatch(/public\.is_valid_(cpf|cnpj)\(v_document\)/i);
+  });
 });
