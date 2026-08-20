@@ -10,6 +10,9 @@ describe('public pre-registration landing page', () => {
     expect(screen.getByText('Gratuito', { exact: true })).toBeInTheDocument();
     expect(screen.getByText('Pré-lançamento em Fortaleza', { exact: true })).toBeInTheDocument();
     expect(screen.getByText('Cadastre seu trabalho de graça.')).toBeInTheDocument();
+    expect(screen.getByText(
+      'Ao continuar, você confirma que leu e concorda com os termos de uso, termos de serviço e política de privacidade do FazAí.',
+    )).toBeInTheDocument();
     expect(screen.queryByText(/até 2 serviços/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/até 5 imagens/i)).not.toBeInTheDocument();
     expect(screen.getByText(/analisado antes da publicação/i)).toBeInTheDocument();

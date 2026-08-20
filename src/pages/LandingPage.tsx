@@ -40,6 +40,7 @@ export default function LandingPage({ onStart, siteUrl = import.meta.env.VITE_SI
       </section>
 
       <section className="landing-note">
+        <p>Ao continuar, você confirma que leu e concorda com os termos de uso, termos de serviço e política de privacidade do FazAí.</p>
         <nav className="legal-links" aria-label="Informações legais">
           <a href={link('/termos')}>Termos de Uso</a>
           <a href={link('/termos-de-servico')}>Termos de Serviço</a>
