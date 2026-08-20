@@ -1,4 +1,4 @@
-import officialLogo from '@/assets/fazai-logo.png';
+import officialLogo from '@/assets/fazai-brand-logo.png';
 
 export default function BrandMark() {
   return (

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { WizardStep } from '@/hooks/usePreRegistration';
 
 const labels: Array<{ step: WizardStep; label: string }> = [
@@ -32,7 +33,7 @@ export default function ProgressHeader({ currentStep }: { currentStep: WizardSte
         </div>
       </div>
 
-      <ol className="progress-header__steps">
+      <ol className="progress-header__steps" style={{ '--step-count': labels.length } as CSSProperties}>
         {labels.map((item, index) => (
           <li key={item.step}>
             <span

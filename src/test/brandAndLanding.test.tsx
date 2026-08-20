@@ -7,7 +7,7 @@ describe('FazAí brand presentation', () => {
   it('uses the official FazAí logo asset in the brand mark', () => {
     render(<BrandMark />);
 
-    expect(screen.getByRole('img', { name: 'FazAí' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'FazAí' })).toHaveAttribute('src', expect.stringContaining('fazai-brand-logo.png'));
   });
 
   it('explains that the Android app will be available on Google Play', () => {

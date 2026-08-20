@@ -9,6 +9,7 @@ describe('ProgressHeader', () => {
     expect(screen.getByText('Etapa 4 de 6')).toBeInTheDocument();
     expect(screen.getByText('Imagens', { selector: '.progress-header__mobile-title' })).toBeInTheDocument();
     expect(screen.getByText('Imagens', { selector: '[aria-current="step"]' })).toBeInTheDocument();
+    expect(screen.getByRole('list')).toHaveStyle({ '--step-count': '6' });
   });
 
   it('distinguishes completed, current and upcoming desktop steps', () => {
