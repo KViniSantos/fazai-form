@@ -59,6 +59,7 @@ export interface SubmissionInput {
   serviceTermsAccepted: boolean;
   privacyAccepted: boolean;
   publicationConsent: boolean;
+  securityAcknowledged: boolean;
 }
 
 function makeUuid(): string {
@@ -215,15 +216,16 @@ export function createPreRegistrationRepository(client: PreRegistrationClient) {
     const paths = input.services.flatMap(({ images }) => images.map((image) => image.path));
 
     try {
-      if (!input.termsAccepted || !input.serviceTermsAccepted || !input.privacyAccepted || !input.publicationConsent) {
+      if (!input.termsAccepted || !input.serviceTermsAccepted || !input.privacyAccepted || !input.publicationConsent || !input.securityAcknowledged) {
         throw new Error('Aceite os termos e autorize a publicação antes de enviar.');
       }
 
-      const { data, error } = await client.rpc('submit_pre_registration', {
+      const { data, error } = await client.rpc('secure_submit_pre_registration', {
         p_profile: serializeProfile(input.profile),
         p_services: input.services.map(serializeService),
         p_terms_version: LEGAL_VERSION,
         p_publication_version: LEGAL_VERSION,
+        p_security_acknowledged: input.securityAcknowledged,
       });
       const submitError = errorFrom(error, 'Não foi possível enviar o pré-cadastro.');
       if (submitError) throw submitError;

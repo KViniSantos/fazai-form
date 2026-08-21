@@ -87,12 +87,13 @@ describe('provider pre-registration validation', () => {
       serviceTermsAccepted: true,
       privacyAccepted: true,
       publicationConsent: false,
+      securityAcknowledged: false,
       email: 'prestador@example.com',
     });
 
     expect(result.success).toBe(false);
     expect(result.error?.issues.map((issue) => issue.path.join('.'))).toEqual(
-      expect.arrayContaining(['services', 'publicationConsent']),
+      expect.arrayContaining(['services', 'publicationConsent', 'securityAcknowledged']),
     );
   });
 });

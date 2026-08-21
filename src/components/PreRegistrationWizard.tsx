@@ -71,7 +71,8 @@ export default function PreRegistrationWizard({ state, dispatch, dependencies }:
     serviceTermsAccepted: state.serviceTermsAccepted,
     privacyAccepted: state.privacyAccepted,
     publicationConsent: state.publicationConsent,
-  }), [state.termsAccepted, state.serviceTermsAccepted, state.privacyAccepted, state.publicationConsent]);
+    securityAcknowledged: state.securityAcknowledged,
+  }), [state.termsAccepted, state.serviceTermsAccepted, state.privacyAccepted, state.publicationConsent, state.securityAcknowledged]);
 
   if (state.submitted || state.step === 'success') return <SuccessPage serviceCount={state.result?.serviceIds.length ?? state.services.length} />;
 

@@ -57,6 +57,7 @@ export interface PreRegistrationDraft {
   serviceTermsAccepted: boolean;
   privacyAccepted: boolean;
   publicationConsent: boolean;
+  securityAcknowledged: boolean;
 }
 
 export interface SubmissionResult {

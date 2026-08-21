@@ -90,6 +90,7 @@ export function validateSubmission(input: {
   serviceTermsAccepted: boolean;
   privacyAccepted: boolean;
   publicationConsent: boolean;
+  securityAcknowledged: boolean;
 }) {
   const result = z.object({
     profile: profileSchema,
@@ -99,6 +100,7 @@ export function validateSubmission(input: {
     serviceTermsAccepted: z.literal(true, { message: 'Aceite os Termos de Serviço.' }),
     privacyAccepted: z.literal(true, { message: 'Aceite a Política de Privacidade.' }),
     publicationConsent: z.literal(true, { message: 'Autorize a publicação do serviço.' }),
+    securityAcknowledged: z.literal(true, { message: 'Confirme as orientações de segurança.' }),
   }).safeParse(input);
 
   return result;

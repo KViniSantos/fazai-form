@@ -71,6 +71,7 @@ function makeSubmission(uploadedImages: SubmissionInput['services'][number]['ima
     serviceTermsAccepted: true,
     privacyAccepted: true,
     publicationConsent: true,
+    securityAcknowledged: true,
   };
 }
 
@@ -158,9 +159,10 @@ describe('pre-registration Supabase repository', () => {
       serviceIds: ['service-1'],
       status: 'pendente',
     });
-    expect(rpc).toHaveBeenCalledWith('submit_pre_registration', expect.objectContaining({
+    expect(rpc).toHaveBeenCalledWith('secure_submit_pre_registration', expect.objectContaining({
       p_terms_version: LEGAL_VERSION,
       p_publication_version: LEGAL_VERSION,
+      p_security_acknowledged: true,
       p_profile: expect.objectContaining({
         telefone: '85999998888',
         whatsapp: '85999998888',

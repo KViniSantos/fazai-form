@@ -59,10 +59,14 @@ describe('provider pre-registration wizard state', () => {
       removeItem: vi.fn(),
     };
     const storage = storageMock as unknown as Storage;
-    const state = preRegistrationReducer(initialPreRegistrationState, {
+    const serviceState = preRegistrationReducer(initialPreRegistrationState, {
       type: 'UPDATE_SERVICE',
       index: 0,
       patch: { titulo: 'Serviço salvo' },
+    });
+    const state = preRegistrationReducer(serviceState, {
+      type: 'SET_CONSENTS',
+      patch: { securityAcknowledged: true },
     });
 
     saveDraft(state, storage);
@@ -70,10 +74,12 @@ describe('provider pre-registration wizard state', () => {
     const serialized = JSON.parse(storageMock.setItem.mock.calls[0]?.[1] as string) as Record<string, unknown>;
     expect(serialized.version).toBe(DRAFT_VERSION);
     expect(serialized).not.toHaveProperty('otp');
+    expect(serialized).not.toHaveProperty('securityAcknowledged');
     expect(serialized.services).toEqual([expect.not.objectContaining({ file: expect.anything() })]);
 
     storageMock.getItem.mockReturnValue(JSON.stringify(serialized));
     expect(loadDraft(storage)?.services[0]?.titulo).toBe('Serviço salvo');
+    expect(loadDraft(storage)?.securityAcknowledged).toBe(false);
     storageMock.getItem.mockReturnValue(JSON.stringify({ ...serialized, version: DRAFT_VERSION + 1 }));
     expect(loadDraft(storage)).toBeNull();
     clearDraft(storage);

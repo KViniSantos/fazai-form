@@ -17,7 +17,7 @@ describe('pre-registration review step', () => {
     const profile = { ...makeEmptyProfile(), nome: 'Ana', sobrenome: 'Silva', whatsapp: '85999998888' };
     const service = { ...makeEmptyService(), titulo: 'Instalação elétrica', descricao: 'A'.repeat(100), tipoPreco: 'fixo' as const, precoMinimo: 150, cidadeNome: 'Fortaleza', estado: 'CE', imagens: [makeImage()], imagemCount: 1 };
     function ReviewHarness() {
-      const [consents, setConsents] = useState({ termsAccepted: false, serviceTermsAccepted: false, privacyAccepted: false, publicationConsent: false });
+      const [consents, setConsents] = useState({ termsAccepted: false, serviceTermsAccepted: false, privacyAccepted: false, publicationConsent: false, securityAcknowledged: false });
       return <ReviewStep profile={profile} services={[service]} consents={consents} onConsentChange={(patch) => setConsents((current) => ({ ...current, ...patch }))} onSubmit={onSubmit} />;
     }
     render(<ReviewHarness />);
@@ -28,6 +28,9 @@ describe('pre-registration review step', () => {
     expect(screen.getByText(/Fortaleza/i)).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /imagem do serviço/i })).toBeInTheDocument();
     expect(screen.getByText(/ficarão bloqueados para edição/i)).toBeInTheDocument();
+    expect(screen.getByText(/Atenção a golpes/i)).toBeInTheDocument();
+    expect(screen.getByText(/nunca solicita senhas, tokens ou códigos/i)).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /Entendi e estou ciente das orientações de segurança/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /enviar cadastro/i })).toBeDisabled();
 
     const checks = screen.getAllByRole('checkbox');

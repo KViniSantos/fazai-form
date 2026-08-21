@@ -26,6 +26,7 @@ export interface PreRegistrationState {
   serviceTermsAccepted: boolean;
   privacyAccepted: boolean;
   publicationConsent: boolean;
+  securityAcknowledged: boolean;
   submitted: boolean;
   result: SubmissionResult | null;
 }
@@ -38,7 +39,7 @@ export type PreRegistrationAction =
   | { type: 'REMOVE_SERVICE'; index: number }
   | { type: 'SET_ACTIVE_SERVICE'; index: number }
   | { type: 'SET_IMAGES'; index: number; images: PreparedImage[] }
-  | { type: 'SET_CONSENTS'; patch: Partial<Pick<PreRegistrationState, 'termsAccepted' | 'serviceTermsAccepted' | 'privacyAccepted' | 'publicationConsent'>> }
+  | { type: 'SET_CONSENTS'; patch: Partial<Pick<PreRegistrationState, 'termsAccepted' | 'serviceTermsAccepted' | 'privacyAccepted' | 'publicationConsent' | 'securityAcknowledged'>> }
   | { type: 'NEXT' }
   | { type: 'BACK' }
   | { type: 'GO_TO_STEP'; step: WizardStep }
@@ -58,6 +59,7 @@ export const initialPreRegistrationState: PreRegistrationState = {
   serviceTermsAccepted: false,
   privacyAccepted: false,
   publicationConsent: false,
+  securityAcknowledged: false,
   submitted: false,
   result: null,
 };
